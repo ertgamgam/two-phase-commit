@@ -5,6 +5,6 @@ namespace TwoPhaseCommitCoordinator.Repository
     interface ITwoPhaseRepository
     {
         Task<bool> CommitTransaction(string transactionId);
-        Task<bool> RoleBackTransaction(string transactionId);
+        Task<bool> RollBackTransaction(string transactionId);
     }
 }
