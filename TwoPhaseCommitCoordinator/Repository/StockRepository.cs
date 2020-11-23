@@ -5,10 +5,10 @@ using Npgsql;
 
 namespace TwoPhaseCommitCoordinator.Repository
 {
-    public class WalletRepository : ITwoPhaseRepository
+    public class StockRepository : ITwoPhaseRepository
     {
         private const string ConnectionString =
-            "User ID=postgres;Password=Gamgam123456;Host=localhost;Port=5432;Database=wallet;Pooling=true;Timeout=5";
+            "User ID=postgres;Password=Gamgam123456;Host=localhost;Port=5432;Database=stock;Pooling=true;Timeout=5";
 
         private IDbConnection Connection
         {
@@ -32,20 +32,22 @@ namespace TwoPhaseCommitCoordinator.Repository
             return await connection.ExecuteAsync($"ROLLBACK PREPARED '{transactionId}'") > 0;
         }
 
-        public async Task<int> GetUserBalance(int userId)
+        public async Task<int> GetStockQuantity(int productId)
         {
             using var connection = Connection;
-            return await connection.ExecuteScalarAsync<int>("SELECT balance FROM dbo.balance WHERE user_id=@userId",
-                new {userId = userId});
+            return await connection.ExecuteScalarAsync<int>(
+                "SELECT quantity FROM dbo.stock WHERE  product_id=@productId",
+                new {productId = productId});
         }
 
-        public async Task<bool> PrepareDecreaseUserBalanceTransaction(int userId, int amount, string transactionId)
+        public async Task<bool> PrepareDecreaseStockQuantityTransactionTransaction(int productId, int quantity,
+            string transactionId)
         {
             using var connection = Connection;
             return await connection.ExecuteAsync($@"BEGIN;
-                                                       UPDATE dbo.balance SET balance=balance - @amount where user_id=@userId;
+                                                       UPDATE dbo.stock SET quantity=quantity - @quantity where product_id=@productId;
                                                        PREPARE TRANSACTION '{transactionId}';", new
-                {amount = amount, userId = userId}) > 0;
+                {quantity = quantity, productId = productId}) > 0;
         }
     }
 }
