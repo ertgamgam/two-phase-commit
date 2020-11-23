@@ -8,7 +8,7 @@ namespace TwoPhaseCommitCoordinator
 {
     public sealed class DecreaseStockQuantityTransaction : TwoPhaseTransaction
     {
-        private IEnumerable<string> RequiredTransactionParams => new List<string> {"productId", "quantity"};
+        private readonly IEnumerable<string> _requiredTransactionParams = new List<string> {"productId", "quantity"};
         private readonly StockRepository _stockRepository;
 
         public DecreaseStockQuantityTransaction(ITwoPhaseRepository twoPhaseRepository,
@@ -16,7 +16,7 @@ namespace TwoPhaseCommitCoordinator
             transactionParams)
         {
             if (transactionParams is null ||
-                RequiredTransactionParams.Any(key => !transactionParams.ContainsKey(key)))
+                _requiredTransactionParams.Any(key => !transactionParams.ContainsKey(key)))
             {
                 throw new MissingTransactionParamException();
             }
