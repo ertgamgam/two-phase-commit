@@ -27,7 +27,7 @@ namespace TwoPhaseCommitCoordinator
 
             Console.WriteLine("-----");
             var stockRepository = new StockRepository();
-            var decreaseStockQuantityTransaction = new DecreaseStockQuantityTransaction(stockRepository,
+            TwoPhaseTransaction decreaseStockQuantityTransaction = new DecreaseStockQuantityTransaction(stockRepository,
                 new Dictionary<string, string>()
                     {{"productId", "12"}, {"quantity", "10"}});
 
