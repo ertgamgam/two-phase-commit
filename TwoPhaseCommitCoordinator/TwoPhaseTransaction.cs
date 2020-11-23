@@ -20,8 +20,6 @@ namespace TwoPhaseCommitCoordinator
         protected Dictionary<string, string> TransactionParams { get; set; }
 
         protected string TransactionId { get; } = Guid.NewGuid().ToString();
-
-        protected abstract IEnumerable<string> RequiredTransactionParams { get; }
         public abstract Task PrepareTransaction();
 
         public async Task CommitTransaction()

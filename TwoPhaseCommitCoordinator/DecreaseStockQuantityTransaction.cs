@@ -8,7 +8,7 @@ namespace TwoPhaseCommitCoordinator
 {
     public sealed class DecreaseStockQuantityTransaction : TwoPhaseTransaction
     {
-        protected override IEnumerable<string> RequiredTransactionParams => new List<string> {"productId", "quantity"};
+        private IEnumerable<string> RequiredTransactionParams => new List<string> {"productId", "quantity"};
         private readonly StockRepository _stockRepository;
 
         public DecreaseStockQuantityTransaction(ITwoPhaseRepository twoPhaseRepository,
