@@ -6,14 +6,13 @@ using TwoPhaseCommitCoordinator.Repository;
 
 namespace TwoPhaseCommitCoordinator
 {
-    public sealed class DecreaseStockQuantityTransaction : TwoPhaseTransaction
+    public class DecreaseUserBalanceTransaction : TwoPhaseTransaction
     {
-        private readonly IEnumerable<string> _requiredTransactionParams = new List<string> {"productId", "quantity"};
-        private readonly StockRepository _stockRepository;
+        private readonly IEnumerable<string> _requiredTransactionParams = new List<string> {"userId", "balance"};
+        private readonly WalletRepository _walletRepository;
 
-        public DecreaseStockQuantityTransaction(ITwoPhaseRepository twoPhaseRepository,
-            Dictionary<string, string> transactionParams) : base(twoPhaseRepository,
-            transactionParams)
+        public DecreaseUserBalanceTransaction(ITwoPhaseRepository twoPhaseRepository,
+            Dictionary<string, string> transactionParams) : base(twoPhaseRepository, transactionParams)
         {
             if (transactionParams is null ||
                 _requiredTransactionParams.Any(key => !transactionParams.ContainsKey(key)))
@@ -21,16 +20,15 @@ namespace TwoPhaseCommitCoordinator
                 throw new MissingTransactionParamException();
             }
 
-            _stockRepository = TwoPhaseRepository as StockRepository;
+            _walletRepository = TwoPhaseRepository as WalletRepository;
         }
-
 
         public override async Task PrepareTransaction()
         {
-            var productId = Convert.ToInt32(TransactionParams["productId"]);
-            var quantity = Convert.ToInt32(TransactionParams["quantity"]);
-            var stockQuantity = await _stockRepository.GetStockQuantity(productId);
-            if (stockQuantity <= 0)
+            var userId = Convert.ToInt32(TransactionParams["productId"]);
+            var amount = Convert.ToInt32(TransactionParams["quantity"]);
+            var balance = await _walletRepository.GetUserBalance(userId);
+            if (balance <= 0)
             {
                 Status = TransactionStatus.Fail;
             }
@@ -38,7 +36,8 @@ namespace TwoPhaseCommitCoordinator
             {
                 try
                 {
-                    await _stockRepository.PrepareDecreaseStockQuantityTransaction(productId, quantity,
+                    await _walletRepository.PrepareDecreaseUserBalanceTransaction(
+                        userId, amount,
                         TransactionId);
                     Status = TransactionStatus.Prepared;
                 }

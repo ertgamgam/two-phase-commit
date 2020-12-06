@@ -40,7 +40,7 @@ namespace TwoPhaseCommitCoordinator.Repository
                 new {productId = productId});
         }
 
-        public async Task<bool> PrepareDecreaseStockQuantityTransactionTransaction(int productId, int quantity,
+        public async Task<bool> PrepareDecreaseStockQuantityTransaction(int productId, int quantity,
             string transactionId)
         {
             using var connection = Connection;
