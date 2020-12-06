@@ -1,5 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using TwoPhaseCommitCoordinator.Repository;
 
@@ -9,37 +9,37 @@ namespace TwoPhaseCommitCoordinator
     {
         static async Task Main(string[] args)
         {
-            // var walletRepository = new WalletRepository();
-            // Console.WriteLine(await walletRepository.GetUserBalance(150));
-            // var transactionId = Guid.NewGuid().ToString();
-            // await walletRepository.PrepareDecreaseUserBalanceTransaction(150, 15, transactionId);
-            // Console.WriteLine(await walletRepository.GetUserBalance(150));
-            // await walletRepository.CommitTransaction(transactionId);
-            // Console.WriteLine(await walletRepository.GetUserBalance(150));
-            //
-            // Console.WriteLine("-----");
-            // var stockRepository = new StockRepository();
-            // Console.WriteLine(await stockRepository.GetStockQuantity(12));
-            // await stockRepository.PrepareDecreaseStockQuantityTransactionTransaction(12, 10, transactionId);
-            // Console.WriteLine(await stockRepository.GetStockQuantity(12));
-            // await stockRepository.CommitTransaction(transactionId);
-            // Console.WriteLine(await stockRepository.GetStockQuantity(12));
+            // var logger = ApplicationLogging.CreateLogger<Program>();
 
-            Console.WriteLine("-----");
             var stockRepository = new StockRepository();
-            TwoPhaseTransaction decreaseStockQuantityTransaction = new DecreaseStockQuantityTransaction(stockRepository,
-                new Dictionary<string, string>()
-                    {{"productId", "12"}, {"quantity", "10"}});
+            var walletRepository = new WalletRepository();
 
-            Console.WriteLine(decreaseStockQuantityTransaction.Status);
-            await decreaseStockQuantityTransaction.PrepareTransaction();
-            if (decreaseStockQuantityTransaction.Status is TransactionStatus.Prepared
-            ) //TODO : SHOULD MOVE TO BASE CLASS
+
+            var twoPhaseTransactions = new List<TwoPhaseTransaction>()
             {
-                await decreaseStockQuantityTransaction.CommitTransaction();
+                new DecreaseStockQuantityTransaction(stockRepository,
+                    new Dictionary<string, string>() {{"productId", "12"}, {"quantity", "13"}}),
+                new DecreaseWalletBalanceTransaction(walletRepository,
+                    new Dictionary<string, string>() {{"userId", "150"}, {"balance", "300"}})
+            };
+
+            var tasks = new List<Task>();
+            twoPhaseTransactions.ForEach(x => tasks.Add(x.PrepareTransaction()));
+            Task.WaitAll(tasks.ToArray());
+            tasks.Clear();
+
+            if (twoPhaseTransactions.All(x => x.Status is TransactionStatus.Prepared))
+            {
+                twoPhaseTransactions.ForEach(x => tasks.Add(x.CommitTransaction()));
             }
 
-            Console.ReadLine();
+            else
+            {
+                twoPhaseTransactions.Where(x => x.Status is TransactionStatus.Fail)
+                    .ToList().ForEach(x => tasks.Add(x.RollBackTransaction()));
+            }
+
+            Task.WaitAll(tasks.ToArray());
         }
     }
 }

@@ -5,8 +5,10 @@
       <e p="packages" t="ExcludeRecursive" />
       <e p="TwoPhaseCommit.sln" t="IncludeFlat" />
       <e p="TwoPhaseCommitCoordinator" t="IncludeRecursive">
+        <e p="ApplicationLogging.cs" t="Include" />
         <e p="bin" t="ExcludeRecursive" />
         <e p="DecreaseStockQuantityTransaction.cs" t="Include" />
+        <e p="DecreaseWalletBalanceTransaction.cs" t="Include" />
         <e p="MissingTransactionParamException.cs" t="Include" />
         <e p="obj" t="ExcludeRecursive">
           <e p="Debug" t="Include">

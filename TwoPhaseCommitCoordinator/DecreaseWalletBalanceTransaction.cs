@@ -6,12 +6,12 @@ using TwoPhaseCommitCoordinator.Repository;
 
 namespace TwoPhaseCommitCoordinator
 {
-    public class DecreaseUserBalanceTransaction : TwoPhaseTransaction
+    public class DecreaseWalletBalanceTransaction : TwoPhaseTransaction
     {
         private readonly IEnumerable<string> _requiredTransactionParams = new List<string> {"userId", "balance"};
         private readonly WalletRepository _walletRepository;
 
-        public DecreaseUserBalanceTransaction(ITwoPhaseRepository twoPhaseRepository,
+        public DecreaseWalletBalanceTransaction(ITwoPhaseRepository twoPhaseRepository,
             Dictionary<string, string> transactionParams) : base(twoPhaseRepository, transactionParams)
         {
             if (transactionParams is null ||
@@ -25,8 +25,8 @@ namespace TwoPhaseCommitCoordinator
 
         public override async Task PrepareTransaction()
         {
-            var userId = Convert.ToInt32(TransactionParams["productId"]);
-            var amount = Convert.ToInt32(TransactionParams["quantity"]);
+            var userId = Convert.ToInt32(TransactionParams["userId"]);
+            var amount = Convert.ToInt32(TransactionParams["balance"]);
             var balance = await _walletRepository.GetUserBalance(userId);
             if (balance <= 0)
             {
