@@ -35,7 +35,7 @@ namespace TwoPhaseCommitCoordinator
 
             else
             {
-                twoPhaseTransactions.Where(x => x.Status is TransactionStatus.Fail)
+                twoPhaseTransactions.Where(x => x.Status is TransactionStatus.Prepared)
                     .ToList().ForEach(x => tasks.Add(x.RollBackTransaction()));
             }
 
