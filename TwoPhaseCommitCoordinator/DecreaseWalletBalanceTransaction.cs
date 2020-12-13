@@ -9,7 +9,7 @@ namespace TwoPhaseCommitCoordinator
 {
     public class DecreaseWalletBalanceTransaction : TwoPhaseTransaction
     {
-        private readonly ILogger<DecreaseStockQuantityTransaction> _logger;
+        private readonly ILogger<DecreaseWalletBalanceTransaction> _logger;
         private readonly IEnumerable<string> _requiredTransactionParams = new List<string> {"userId", "totalPrice"};
         private readonly WalletRepository _walletRepository;
 
@@ -23,8 +23,8 @@ namespace TwoPhaseCommitCoordinator
             }
 
             _walletRepository = TwoPhaseRepository as WalletRepository;
-            _logger = ApplicationLogging.CreateLogger<DecreaseStockQuantityTransaction>();
-            _logger.LogInformation($"DecreaseWalletBalanceTransaction was prepared. Transaction Id = {TransactionId}");
+            _logger = ApplicationLogging.CreateLogger<DecreaseWalletBalanceTransaction>();
+            _logger.LogInformation($"DecreaseWalletBalanceTransaction was created. Transaction Id = {TransactionId}");
         }
 
         public override async Task PrepareTransaction()
@@ -32,7 +32,7 @@ namespace TwoPhaseCommitCoordinator
             var userId = Convert.ToInt32(TransactionParams["userId"]);
             var totalPrice = Convert.ToInt32(TransactionParams["totalPrice"]);
             var balance = await _walletRepository.GetUserBalance(userId);
-            if (balance <= 0)
+            if (balance < totalPrice)
             {
                 Status = TransactionStatus.Fail;
                 _logger.LogWarning(

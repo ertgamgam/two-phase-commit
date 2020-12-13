@@ -16,9 +16,9 @@ namespace TwoPhaseCommitCoordinator
             var twoPhaseTransactions = new List<TwoPhaseTransaction>()
             {
                 new DecreaseStockQuantityTransaction(stockRepository,
-                    new Dictionary<string, string>() {{"productId", "12"}, {"quantity", "13"}}),
+                    new Dictionary<string, string>() {{"productId", "12"}, {"quantity", "10"}}),
                 new DecreaseWalletBalanceTransaction(walletRepository,
-                    new Dictionary<string, string>() {{"userId", "150"}, {"totalPrice", "300"}})
+                    new Dictionary<string, string>() {{"userId", "150"}, {"totalPrice", "4000"}})
             };
 
             var tasks = new List<Task>();

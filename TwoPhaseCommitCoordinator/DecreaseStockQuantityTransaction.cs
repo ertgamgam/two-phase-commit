@@ -25,7 +25,7 @@ namespace TwoPhaseCommitCoordinator
 
             _stockRepository = TwoPhaseRepository as StockRepository;
             _logger = ApplicationLogging.CreateLogger<DecreaseStockQuantityTransaction>();
-            _logger.LogInformation($"DecreaseStockQuantityTransaction was prepared. Transaction Id = {TransactionId}");
+            _logger.LogInformation($"DecreaseStockQuantityTransaction was created. Transaction Id = {TransactionId}");
         }
 
 
@@ -34,7 +34,7 @@ namespace TwoPhaseCommitCoordinator
             var productId = Convert.ToInt32(TransactionParams["productId"]);
             var quantity = Convert.ToInt32(TransactionParams["quantity"]);
             var stockQuantity = await _stockRepository.GetStockQuantity(productId);
-            if (stockQuantity <= 0)
+            if (stockQuantity < quantity)
             {
                 Status = TransactionStatus.Fail;
                 _logger.LogWarning(
@@ -54,7 +54,8 @@ namespace TwoPhaseCommitCoordinator
                 {
                     Status = TransactionStatus.Fail;
                     _logger.LogWarning(
-                        $"DecreaseStockQuantityTransaction status was changed as {Status} . Transaction Id = {TransactionId}",e);
+                        $"DecreaseStockQuantityTransaction status was changed as {Status} . Transaction Id = {TransactionId}",
+                        e);
                 }
             }
         }
