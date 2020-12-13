@@ -2,12 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using TwoPhaseCommitCoordinator.Repository;
 
 namespace TwoPhaseCommitCoordinator
 {
     public sealed class DecreaseStockQuantityTransaction : TwoPhaseTransaction
     {
+        private readonly ILogger<DecreaseStockQuantityTransaction> _logger;
         private readonly IEnumerable<string> _requiredTransactionParams = new List<string> {"productId", "quantity"};
         private readonly StockRepository _stockRepository;
 
@@ -22,6 +24,8 @@ namespace TwoPhaseCommitCoordinator
             }
 
             _stockRepository = TwoPhaseRepository as StockRepository;
+            _logger = ApplicationLogging.CreateLogger<DecreaseStockQuantityTransaction>();
+            _logger.LogInformation($"DecreaseStockQuantityTransaction was prepared. Transaction Id = {TransactionId}");
         }
 
 
@@ -33,6 +37,8 @@ namespace TwoPhaseCommitCoordinator
             if (stockQuantity <= 0)
             {
                 Status = TransactionStatus.Fail;
+                _logger.LogWarning(
+                    $"DecreaseStockQuantityTransaction status was changed as {Status} . Transaction Id = {TransactionId}");
             }
             else
             {
@@ -41,10 +47,14 @@ namespace TwoPhaseCommitCoordinator
                     await _stockRepository.PrepareDecreaseStockQuantityTransaction(productId, quantity,
                         TransactionId);
                     Status = TransactionStatus.Prepared;
+                    _logger.LogInformation(
+                        $"DecreaseStockQuantityTransaction status was changed as {Status} . Transaction Id = {TransactionId}");
                 }
                 catch (Exception e)
                 {
                     Status = TransactionStatus.Fail;
+                    _logger.LogWarning(
+                        $"DecreaseStockQuantityTransaction status was changed as {Status} . Transaction Id = {TransactionId}",e);
                 }
             }
         }

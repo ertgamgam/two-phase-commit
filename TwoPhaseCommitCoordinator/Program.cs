@@ -9,8 +9,6 @@ namespace TwoPhaseCommitCoordinator
     {
         static async Task Main(string[] args)
         {
-            // var logger = ApplicationLogging.CreateLogger<Program>();
-
             var stockRepository = new StockRepository();
             var walletRepository = new WalletRepository();
 
@@ -20,7 +18,7 @@ namespace TwoPhaseCommitCoordinator
                 new DecreaseStockQuantityTransaction(stockRepository,
                     new Dictionary<string, string>() {{"productId", "12"}, {"quantity", "13"}}),
                 new DecreaseWalletBalanceTransaction(walletRepository,
-                    new Dictionary<string, string>() {{"userId", "150"}, {"balance", "300"}})
+                    new Dictionary<string, string>() {{"userId", "150"}, {"totalPrice", "300"}})
             };
 
             var tasks = new List<Task>();
